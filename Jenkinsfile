@@ -11,7 +11,7 @@ pipeline {
         stage('Clone') {
             steps {
                 timeout(time: 2, unit: 'MINUTES'){
-                    git branch: 'main', credentialsId: 'github_pat_token', url: 'https://github.com/akzonpunk/S-descuento.git'
+                    git branch: 'main', credentialsId: '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', url: 'https://github.com/akzonpunk/S-descuento.git'
                 }
             }
         }
