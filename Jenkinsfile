@@ -11,7 +11,7 @@ pipeline {
         stage('Clone') {
             steps {
                 timeout(time: 2, unit: 'MINUTES'){
-                    git branch: 'main', credentialsId: 'github_pat_token', url: 'https://github.com/dmamanipar/ProyectosTS2024-C2.git'
+                    git branch: 'main', credentialsId: 'github_pat_token', url: 'https://github.com/akzonpunk/S-descuento.git'
                 }
             }
         }
