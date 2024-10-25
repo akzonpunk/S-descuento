@@ -1,0 +1,75 @@
+name: test-all
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**' #avoid duplicates: only run the PR, not the commit
+    tags-ignore:
+      - 'v*' #avoids rerun existing commit on release
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5 #run tests under xvfb hangs sometimes, kills job if this happens
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v4
+      - name: Select Java Version
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'maven'
+
+      # - name: Build and test UT & IT
+      #   run: mvn test -Dmaven.test.failure.ignore=true -U --no-transfer-progress
+      # Aunque solo los test it que ejecutan swing requieren un display Xvfb, ejecuto todo bajo esta accion
+      - name: Build and run all tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: mvn verify -Dmaven.test.failure.ignore=true -U --no-transfer-progress
+
+      - name: Publish surefire test report
+        if: always()
+        uses: mikepenz/action-junit-report@v4.3.1
+        with:
+          check_name: test-report
+          report_paths: 'target/*-reports/TEST-*.xml'
+          fail_on_failure: 'true'
+ 
+      - if: always()
+        name: Publish html test reports to an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-files
+          path: |
+            target/screenshots/
+            target/site/
+      - if: always()
+        name: Publish test reports for sonarqube job
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-for-sonar
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+            target/site/jacoco/jacoco.xml
+
+  sonarqube:
+    needs: [test]
+    #if: ${{ false }}  # disable for now
+    #Cuando viene de una PR de dependabot este job falla porque no puede leer el token de sonarqube
+    #(restriccion de seguridad de GitHub Actions). Discusion y workarounds:
+    #https://community.sonarsource.com/t/youre-not-authorized-to-run-analysis-and-github-bots/41994/4
+    #https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: javiertuya/sonarqube-action@v1.4.0
+        with: 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          restore-artifact-name1: "test-reports-for-sonar"
+          restore-artifact-path1: "target"
