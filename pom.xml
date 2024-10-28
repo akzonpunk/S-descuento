@@ -8,12 +8,12 @@
 	<version>2.1.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<organization>
-		<name>Grupo de Investigacion en Ingenieria del Software - Universidad de Oviedo</name>
+		<name>Ingenieria del Software - Universidad upeu</name>
 		<url>http://giis.uniovi.es/</url>
 	</organization>
 
 	<name>samples-test-java</name>
-	<url>https://github.com/javiertuya/samples-test-java</url>
+	<url>https://github.com/akzonpunk/S-descuento/tree/master</url>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -441,6 +441,13 @@
 						<artifactId>ant-junit</artifactId>
 						<version>1.10.15</version>
 					</dependency>
+
+					<dependency>
+						<groupId>org.springframework.restdocs</groupId>
+						<artifactId>spring-restdocs-mockmvc</artifactId>
+						<scope>test</scope>
+					</dependency>
+
 					<dependency>
 						<groupId>org.apache.ant</groupId>
 						<artifactId>ant-trax</artifactId>
